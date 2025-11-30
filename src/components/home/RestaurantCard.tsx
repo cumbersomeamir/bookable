@@ -25,14 +25,14 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.imageContainer}>
         <Image source={{uri: primaryImage?.url}} style={styles.image} resizeMode="cover" />
-        
+
         {/* Image indicators */}
         <View style={styles.indicators}>
           {[1, 2, 3].map((_, i) => (
             <View key={i} style={[styles.indicator, i === 0 && styles.activeIndicator]} />
           ))}
         </View>
-        
+
         {/* Badges */}
         <View style={styles.badgesContainer}>
           {restaurant.isAwardWinning && (
@@ -42,7 +42,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
             </View>
           )}
         </View>
-        
+
         {restaurant.isPromoted && (
           <View style={styles.promotedBadge}>
             <Text style={styles.promotedText}>Promoted</Text>
@@ -52,7 +52,9 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
 
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.name} numberOfLines={1}>{restaurant.name}</Text>
+          <Text style={styles.name} numberOfLines={1}>
+            {restaurant.name}
+          </Text>
           <TouchableOpacity style={styles.bookmarkBtn}>
             <Icon name="bookmark-border" size={22} color="#DA3743" />
           </TouchableOpacity>
@@ -65,13 +67,15 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
           <Text style={styles.dot}>•</Text>
           <Icon name="star" size={14} color="#DA3743" />
           <Text style={styles.rating}>{restaurant.rating.toFixed(1)}</Text>
-          <View style={styles.distanceContainer}>
-            <Icon name="place" size={14} color="#6B7280" />
-            <Text style={styles.distance}>{restaurant.distance.display}</Text>
-          </View>
+          {restaurant.distance && (
+            <View style={styles.distanceContainer}>
+              <Icon name="place" size={14} color="#6B7280" />
+              <Text style={styles.distance}>{restaurant.distance.display}</Text>
+            </View>
+          )}
         </View>
 
-        {showTimeSlots && restaurant.timeSlots.length > 0 && (
+        {showTimeSlots && restaurant.timeSlots && restaurant.timeSlots.length > 0 && (
           <View style={styles.timeSlotsContainer}>
             {restaurant.timeSlots.slice(0, 3).map((slot, index) => (
               <TouchableOpacity key={index} style={styles.timeSlot}>
@@ -81,10 +85,12 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({
           </View>
         )}
 
-        {showPoints && showTimeSlots && restaurant.rewardPoints > 0 && (
+        {showPoints && showTimeSlots && restaurant.rewardPoints && restaurant.rewardPoints > 0 && (
           <View style={styles.pointsRow}>
-            {restaurant.timeSlots.slice(0, 3).map((slot, index) => (
-              <Text key={index} style={styles.pointsText}>+{restaurant.rewardPoints.toLocaleString()}pts</Text>
+            {restaurant.timeSlots?.slice(0, 3).map((slot, index) => (
+              <Text key={index} style={styles.pointsText}>
+                +{(restaurant.rewardPoints ?? 0).toLocaleString()}pts
+              </Text>
             ))}
           </View>
         )}
@@ -248,4 +254,3 @@ const styles = StyleSheet.create({
 });
 
 export default RestaurantCard;
-

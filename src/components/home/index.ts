@@ -6,4 +6,3 @@ export {default as AreaChip} from './AreaChip';
 export {default as PromotionCard} from './PromotionCard';
 export {default as ExperienceCard} from './ExperienceCard';
 export {default as FilterBar} from './FilterBar';
-

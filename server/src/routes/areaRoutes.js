@@ -6,4 +6,3 @@ router.get('/', areaController.getAreas);
 router.get('/:slug', areaController.getAreaBySlug);
 
 module.exports = router;
-

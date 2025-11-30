@@ -21,9 +21,11 @@ const FilterBar: React.FC<FilterBarProps> = ({
     <View style={styles.container}>
       <TouchableOpacity style={styles.filterButton} onPress={onGuestsPress} activeOpacity={0.7}>
         <Icon name="person-outline" size={18} color="#1F2937" />
-        <Text style={styles.filterText}>{guests} • {date}</Text>
+        <Text style={styles.filterText}>
+          {guests} • {date}
+        </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity style={styles.filterButton} onPress={onLocationPress} activeOpacity={0.7}>
         <Icon name="place" size={18} color="#1F2937" />
         <Text style={styles.filterText}>{location}</Text>
@@ -58,4 +60,3 @@ const styles = StyleSheet.create({
 });
 
 export default FilterBar;
-

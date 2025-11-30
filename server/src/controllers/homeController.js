@@ -23,80 +23,68 @@ exports.getHomeData = async (req, res) => {
       promotions,
     ] = await Promise.all([
       // Award-winning restaurants
-      Restaurant.find({ isActive: true, isAwardWinning: true })
-        .sort({ rating: -1 })
-        .limit(10)
-        .lean(),
-      
+      Restaurant.find({isActive: true, isAwardWinning: true}).sort({rating: -1}).limit(10).lean(),
+
       // Outdoor dining
-      Restaurant.find({ isActive: true, hasOutdoorDining: true, 'timeSlots.0': { $exists: true } })
-        .sort({ rating: -1 })
+      Restaurant.find({isActive: true, hasOutdoorDining: true, 'timeSlots.0': {$exists: true}})
+        .sort({rating: -1})
         .limit(10)
         .lean(),
-      
+
       // Featured restaurants
-      Restaurant.find({ isActive: true, isFeatured: true, rewardPoints: { $gt: 0 } })
-        .sort({ rewardPoints: -1, rating: -1 })
+      Restaurant.find({isActive: true, isFeatured: true, rewardPoints: {$gt: 0}})
+        .sort({rewardPoints: -1, rating: -1})
         .limit(10)
         .lean(),
-      
+
       // New to Bookable
-      Restaurant.find({ isActive: true, isNewToBookable: true })
-        .sort({ createdAt: -1 })
+      Restaurant.find({isActive: true, isNewToBookable: true})
+        .sort({createdAt: -1})
         .limit(10)
         .lean(),
-      
+
       // Book for tonight
-      Restaurant.find({ isActive: true, 'timeSlots.0': { $exists: true }, rewardPoints: { $gt: 0 } })
-        .sort({ rewardPoints: -1, rating: -1 })
+      Restaurant.find({isActive: true, 'timeSlots.0': {$exists: true}, rewardPoints: {$gt: 0}})
+        .sort({rewardPoints: -1, rating: -1})
         .limit(10)
         .lean(),
-      
+
       // Wine tasting
-      Restaurant.find({ isActive: true, features: 'Wine tasting' })
-        .sort({ rating: -1 })
+      Restaurant.find({isActive: true, features: 'Wine tasting'})
+        .sort({rating: -1})
         .limit(10)
         .lean(),
-      
+
       // Top booked
-      Restaurant.find({ isActive: true, 'rank.topBooked': { $exists: true, $lte: 5 } })
-        .sort({ 'rank.topBooked': 1 })
+      Restaurant.find({isActive: true, 'rank.topBooked': {$exists: true, $lte: 5}})
+        .sort({'rank.topBooked': 1})
         .limit(5)
         .lean(),
-      
+
       // Top viewed
-      Restaurant.find({ isActive: true, 'rank.topViewed': { $exists: true, $lte: 5 } })
-        .sort({ 'rank.topViewed': 1 })
+      Restaurant.find({isActive: true, 'rank.topViewed': {$exists: true, $lte: 5}})
+        .sort({'rank.topViewed': 1})
         .limit(5)
         .lean(),
-      
+
       // Top saved
-      Restaurant.find({ isActive: true, 'rank.topSaved': { $exists: true, $lte: 5 } })
-        .sort({ 'rank.topSaved': 1 })
+      Restaurant.find({isActive: true, 'rank.topSaved': {$exists: true, $lte: 5}})
+        .sort({'rank.topSaved': 1})
         .limit(5)
         .lean(),
-      
+
       // Categories
-      Category.find({ isActive: true })
-        .sort({ displayOrder: 1 })
-        .limit(10)
-        .lean(),
-      
+      Category.find({isActive: true}).sort({displayOrder: 1}).limit(10).lean(),
+
       // Areas
-      Area.find({ isActive: true })
-        .sort({ displayOrder: 1 })
-        .limit(10)
-        .lean(),
-      
+      Area.find({isActive: true}).sort({displayOrder: 1}).limit(10).lean(),
+
       // Featured experiences
-      Experience.find({ isActive: true, isFeatured: true })
-        .sort({ displayOrder: 1 })
-        .limit(10)
-        .lean(),
-      
+      Experience.find({isActive: true, isFeatured: true}).sort({displayOrder: 1}).limit(10).lean(),
+
       // Promotions / Get inspired
-      Promotion.find({ isActive: true, type: 'get-inspired' })
-        .sort({ displayOrder: 1 })
+      Promotion.find({isActive: true, type: 'get-inspired'})
+        .sort({displayOrder: 1})
         .limit(5)
         .lean(),
     ]);
@@ -104,8 +92,11 @@ exports.getHomeData = async (req, res) => {
     // Get greeting based on time
     const hour = new Date().getHours();
     let greeting = 'Good morning';
-    if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
-    else if (hour >= 17) greeting = 'Good evening';
+    if (hour >= 12 && hour < 17) {
+      greeting = 'Good afternoon';
+    } else if (hour >= 17) {
+      greeting = 'Good evening';
+    }
 
     res.json({
       success: true,
@@ -119,7 +110,8 @@ exports.getHomeData = async (req, res) => {
           },
           awardWinning: {
             title: 'Award-winning',
-            subtitle: 'Restaurants that have won notable industry rewards with tables available today.',
+            subtitle:
+              'Restaurants that have won notable industry rewards with tables available today.',
             data: awardWinning,
           },
           outdoorDining: {
@@ -129,11 +121,11 @@ exports.getHomeData = async (req, res) => {
           },
           topRestaurants: {
             title: 'Top restaurants this week',
-            subtitle: 'Explore what\'s popular with other diners with these lists, updated weekly.',
+            subtitle: "Explore what's popular with other diners with these lists, updated weekly.",
             tabs: {
-              topBooked: { title: 'Top booked', data: topBooked },
-              topViewed: { title: 'Top viewed', data: topViewed },
-              topSaved: { title: 'Top saved', data: topSaved },
+              topBooked: {title: 'Top booked', data: topBooked},
+              topViewed: {title: 'Top viewed', data: topViewed},
+              topSaved: {title: 'Top saved', data: topSaved},
             },
           },
           featured: {
@@ -153,7 +145,8 @@ exports.getHomeData = async (req, res) => {
           },
           featuredExperiences: {
             title: 'Featured Experiences',
-            subtitle: 'Find a unique dining experience and let restaurants show you the best they have to offer.',
+            subtitle:
+              'Find a unique dining experience and let restaurants show you the best they have to offer.',
             data: experiences,
           },
           getInspired: {
@@ -173,7 +166,6 @@ exports.getHomeData = async (req, res) => {
     });
   } catch (error) {
     console.error('Home data error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({success: false, message: error.message});
   }
 };
-

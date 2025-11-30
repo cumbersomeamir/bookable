@@ -64,5 +64,17 @@ export const experienceApi = {
   getFeatured: (limit = 10) => api.get('/experiences/featured', {params: {limit}}),
 };
 
-export default api;
+// Restaurant Detail APIs
+export const restaurantDetailApi = {
+  getBySlug: (slug: string) => api.get(`/restaurant/slug/${slug}`),
+  getFullDetail: (slug: string) => api.get(`/restaurant/slug/${slug}/full`),
+  getMenu: (slug: string, params?: {category?: string; popular?: boolean}) =>
+    api.get(`/restaurant/slug/${slug}/menu`, {params}),
+  getReviews: (slug: string, params?: {limit?: number; page?: number; sort?: string}) =>
+    api.get(`/restaurant/slug/${slug}/reviews`, {params}),
+  getExperiences: (slug: string) => api.get(`/restaurant/slug/${slug}/experiences`),
+  getByCuisine: (cuisine: string, params?: {limit?: number; page?: number}) =>
+    api.get(`/restaurant/cuisine/${cuisine}`, {params}),
+};
 
+export default api;

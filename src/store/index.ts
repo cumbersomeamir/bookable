@@ -12,16 +12,18 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import appReducer from './slices/appSlice';
+import authReducer from './slices/authSlice';
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
-  whitelist: ['app'], // Add reducers you want to persist
+  whitelist: ['app', 'auth'], // Add reducers you want to persist
 };
 
 const rootReducer = combineReducers({
   app: appReducer,
+  auth: authReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

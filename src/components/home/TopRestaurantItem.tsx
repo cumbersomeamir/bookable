@@ -16,7 +16,7 @@ const TopRestaurantItem: React.FC<TopRestaurantItemProps> = ({restaurant, rank, 
     const stars = [];
     const fullStars = Math.floor(restaurant.rating);
     const hasHalfStar = restaurant.rating % 1 >= 0.5;
-    
+
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
         stars.push(<Icon key={i} name="star" size={12} color="#F59E0B" />);
@@ -39,7 +39,9 @@ const TopRestaurantItem: React.FC<TopRestaurantItemProps> = ({restaurant, rank, 
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={1}>{restaurant.name}</Text>
+        <Text style={styles.name} numberOfLines={1}>
+          {restaurant.name}
+        </Text>
         <View style={styles.ratingRow}>
           <View style={styles.stars}>{renderStars()}</View>
           <Text style={styles.reviewCount}>{restaurant.reviewCount.toLocaleString()} reviews</Text>
@@ -53,10 +55,12 @@ const TopRestaurantItem: React.FC<TopRestaurantItemProps> = ({restaurant, rank, 
           <Icon name="bookmark-border" size={22} color="#DA3743" />
         </TouchableOpacity>
         <Text style={styles.priceLevel}>{restaurant.priceLevel}</Text>
-        <View style={styles.distanceRow}>
-          <Icon name="place" size={14} color="#6B7280" />
-          <Text style={styles.distance}>{restaurant.distance.display}</Text>
-        </View>
+        {restaurant.distance && (
+          <View style={styles.distanceRow}>
+            <Icon name="place" size={14} color="#6B7280" />
+            <Text style={styles.distance}>{restaurant.distance.display}</Text>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -150,4 +154,3 @@ const styles = StyleSheet.create({
 });
 
 export default TopRestaurantItem;
-

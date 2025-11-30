@@ -6,4 +6,3 @@ router.get('/', experienceController.getExperiences);
 router.get('/featured', experienceController.getFeaturedExperiences);
 
 module.exports = router;
-

@@ -12,6 +12,8 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useHomeData} from '@/hooks/useHomeData';
 import {Restaurant} from '@/types/restaurant';
 import RestaurantCard from '@/components/home/RestaurantCard';
@@ -23,9 +25,14 @@ import PromotionCard from '@/components/home/PromotionCard';
 import ExperienceCard from '@/components/home/ExperienceCard';
 import FilterBar from '@/components/home/FilterBar';
 
+type RootStackParamList = {
+  RestaurantDetail: {slug: string};
+};
+
 type TopTab = 'topBooked' | 'topViewed' | 'topSaved';
 
 const HomeScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {data, loading, error, refetch} = useHomeData();
   const [activeTopTab, setActiveTopTab] = useState<TopTab>('topBooked');
   const [refreshing, setRefreshing] = useState(false);
@@ -58,6 +65,10 @@ const HomeScreen: React.FC = () => {
 
   const sections = data?.sections;
 
+  const navigateToRestaurant = (slug: string) => {
+    navigation.navigate('RestaurantDetail', {slug});
+  };
+
   const renderRestaurantList = (
     restaurants: Restaurant[],
     showTimeSlots = false,
@@ -72,6 +83,7 @@ const HomeScreen: React.FC = () => {
           restaurant={item}
           showTimeSlots={showTimeSlots}
           showPoints={showPoints}
+          onPress={() => navigateToRestaurant(item.slug)}
         />
       )}
       showsHorizontalScrollIndicator={false}
@@ -99,9 +111,10 @@ const HomeScreen: React.FC = () => {
       <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" />
       <ScrollView
         style={styles.scrollView}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DA3743" />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#DA3743" />
+        }
         showsVerticalScrollIndicator={false}>
-        
         {/* Header with Greeting */}
         <View style={styles.header}>
           <Text style={styles.greeting}>{data?.greeting || 'Good afternoon'}</Text>
@@ -136,6 +149,7 @@ const HomeScreen: React.FC = () => {
                   key={restaurant._id}
                   restaurant={restaurant}
                   rank={index + 1}
+                  onPress={() => navigateToRestaurant(restaurant.slug)}
                 />
               ))}
             </View>
@@ -170,10 +184,7 @@ const HomeScreen: React.FC = () => {
         {/* Featured restaurants */}
         {sections?.featured && sections.featured.data.length > 0 && (
           <View style={styles.section}>
-            <SectionHeader
-              title={sections.featured.title}
-              subtitle={sections.featured.subtitle}
-            />
+            <SectionHeader title={sections.featured.title} subtitle={sections.featured.subtitle} />
             {renderRestaurantList(sections.featured.data, true, true)}
           </View>
         )}

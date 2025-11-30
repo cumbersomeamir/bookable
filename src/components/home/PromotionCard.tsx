@@ -15,7 +15,9 @@ const PromotionCard: React.FC<PromotionCardProps> = ({promotion, onPress}) => {
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
       <Image source={{uri: promotion.image.url}} style={styles.image} resizeMode="cover" />
       <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={2}>{promotion.title}</Text>
+        <Text style={styles.title} numberOfLines={2}>
+          {promotion.title}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -50,4 +52,3 @@ const styles = StyleSheet.create({
 });
 
 export default PromotionCard;
-

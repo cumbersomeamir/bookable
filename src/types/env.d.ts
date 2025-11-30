@@ -10,4 +10,3 @@ declare module 'react-native-config' {
   export const Config: NativeConfig;
   export default Config;
 }
-

@@ -6,4 +6,3 @@ const homeController = require('../controllers/homeController');
 router.get('/', homeController.getHomeData);
 
 module.exports = router;
-

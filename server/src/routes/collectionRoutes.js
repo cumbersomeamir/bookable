@@ -6,4 +6,3 @@ router.get('/', collectionController.getCollections);
 router.get('/:type', collectionController.getCollectionByType);
 
 module.exports = router;
-

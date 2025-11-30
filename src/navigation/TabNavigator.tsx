@@ -29,7 +29,7 @@ const TabNavigator: React.FC = () => {
         tabBarLabelStyle: styles.tabLabel,
         tabBarIcon: ({focused, color}) => {
           let iconName: string;
-          
+
           switch (route.name) {
             case 'Home':
               iconName = 'home';
@@ -95,4 +95,3 @@ const styles = StyleSheet.create({
 });
 
 export default TabNavigator;
-

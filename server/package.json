@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "seed": "node src/seeds/seedDatabase.js"
+    "seed": "node src/seeds/seedDatabase.js",
+    "seed:details": "node src/seeds/seedRestaurantDetails.js",
+    "seed:locations": "node src/seeds/addLocationData.js",
+    "seed:all": "npm run seed && npm run seed:details"
   },
   "dependencies": {
     "cors": "^2.8.5",

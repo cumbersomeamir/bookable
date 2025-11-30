@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {Category} from '@/types/restaurant';
 
 interface CuisineCardProps {
@@ -36,4 +36,3 @@ const styles = StyleSheet.create({
 });
 
 export default CuisineCard;
-

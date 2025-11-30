@@ -37,4 +37,3 @@ export const useHomeData = (): UseHomeDataReturn => {
 
   return {data, loading, error, refetch: fetchData};
 };
-

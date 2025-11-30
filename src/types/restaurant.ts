@@ -22,6 +22,14 @@ export interface RestaurantRank {
   topSaved?: number;
 }
 
+export interface RestaurantLocation {
+  type?: string;
+  coordinates: [number, number]; // [longitude, latitude]
+  address?: string;
+  city?: string;
+  country?: string;
+}
+
 export interface Restaurant {
   _id: string;
   name: string;
@@ -32,17 +40,18 @@ export interface Restaurant {
   rating: number;
   reviewCount: number;
   areaName: string;
-  distance: Distance;
-  badges: string[];
-  features: string[];
-  timeSlots: TimeSlot[];
-  isPromoted: boolean;
-  isAwardWinning: boolean;
-  hasOutdoorDining: boolean;
-  isFeatured: boolean;
-  isNewToBookable: boolean;
-  rewardPoints: number;
-  rank: RestaurantRank;
+  location?: RestaurantLocation;
+  distance?: Distance;
+  badges?: string[];
+  features?: string[];
+  timeSlots?: TimeSlot[];
+  isPromoted?: boolean;
+  isAwardWinning?: boolean;
+  hasOutdoorDining?: boolean;
+  isFeatured?: boolean;
+  isNewToBookable?: boolean;
+  rewardPoints?: number;
+  rank?: RestaurantRank;
   description?: string;
 }
 
@@ -94,9 +103,9 @@ export interface TopRestaurantsSection {
   title: string;
   subtitle: string;
   tabs: {
-    topBooked: { title: string; data: Restaurant[] };
-    topViewed: { title: string; data: Restaurant[] };
-    topSaved: { title: string; data: Restaurant[] };
+    topBooked: {title: string; data: Restaurant[]};
+    topViewed: {title: string; data: Restaurant[]};
+    topSaved: {title: string; data: Restaurant[]};
   };
 }
 
@@ -116,4 +125,3 @@ export interface HomeData {
     areas: HomeSection<Area>;
   };
 }
-

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {Experience} from '@/types/restaurant';
 
 const {width} = Dimensions.get('window');
@@ -37,4 +37,3 @@ const styles = StyleSheet.create({
 });
 
 export default ExperienceCard;
-

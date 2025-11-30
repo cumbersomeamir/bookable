@@ -6,4 +6,3 @@ router.get('/', categoryController.getCategories);
 router.get('/:slug', categoryController.getCategoryBySlug);
 
 module.exports = router;
-

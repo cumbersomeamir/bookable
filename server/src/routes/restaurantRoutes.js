@@ -13,4 +13,3 @@ router.get('/book-tonight', restaurantController.getBookTonight);
 router.get('/:id', restaurantController.getRestaurantById);
 
 module.exports = router;
-

@@ -9,4 +9,3 @@ const localConfig = {
 };
 
 export default localConfig;
-
