@@ -1,79 +1,267 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Bookable
 
-# Getting Started
+A React Native mobile application for book discovery and booking.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Tech Stack
 
-## Step 1: Start the Metro Server
+- **React Native**: 0.73.6
+- **TypeScript**: 5.0.4
+- **State Management**: Redux Toolkit + Redux Persist
+- **Navigation**: React Navigation v7
+- **UI Components**: React Native Vector Icons, Linear Gradient, SVG
+- **Network**: Axios
+- **Storage**: Async Storage
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Prerequisites
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- Node.js >= 18
+- npm or yarn
+- React Native CLI
+- Xcode (for iOS development)
+- Android Studio (for Android development)
+- CocoaPods (for iOS dependencies)
+- MongoDB Atlas account (for backend)
+
+## Environment Configuration
+
+This project uses environment files for configuration:
+
+| File | Purpose |
+|------|---------|
+| `.env` | Default env for mobile app (read by react-native-config) |
+| `mobile.env` | Mobile app configuration |
+| `server.env` | Backend server configuration |
+| `*.env.example` | Example templates (safe to commit) |
+
+### Setting Up Environment Files
+
+1. Copy the example files:
+   ```bash
+   cp mobile.env.example mobile.env
+   cp server.env.example server.env
+   ```
+
+2. Update with your credentials (or use the provided defaults for development)
+
+### Environment Variables
+
+**Mobile App (`mobile.env` / `.env`):**
+- `GOOGLE_WEB_CLIENT_ID` - Google OAuth Web Client ID
+- `GOOGLE_ANDROID_CLIENT_ID` - Google OAuth Android Client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth Client Secret
+- `GOOGLE_MAPS_API_KEY` - Google Maps API Key
+- `API_BASE_URL` - Backend API URL (use `10.0.2.2` for Android emulator, `localhost` for iOS simulator)
+
+**Server (`server.env`):**
+- `NODE_ENV` - Environment (development/production)
+- `PORT` - Server port (default: 4000)
+- `MONGODB_URI` - MongoDB connection string (uses `bookable` database)
+- `JWT_SECRET` - Secret for JWT token signing
+
+### MongoDB Collections
+
+This project uses MongoDB with the `bookable` database. Collections are prefixed with `bookable-` to keep them distinct:
+- `bookable-users`
+- `bookable-books`
+- `bookable-bookings`
+- etc.
+
+## Getting Started
+
+### 1. Install Dependencies
 
 ```bash
-# using npm
+npm install
+```
+
+### 2. iOS Setup
+
+```bash
+cd ios
+bundle install          # Install Ruby dependencies (first time only)
+bundle exec pod install # Install CocoaPods dependencies
+cd ..
+```
+
+### 3. Start Metro Bundler
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
+# or with cache reset
+npm run start:reset
 ```
 
-## Step 2: Start your Application
+### 4. Run the Application
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
+**Android:**
 ```bash
-# using npm
+# Ensure Android emulator is running or device is connected
 npm run android
-
-# OR using Yarn
-yarn android
+# or
+npx react-native run-android
 ```
 
-### For iOS
+**iOS:**
+```bash
+npm run ios
+# or
+npx react-native run-ios
+```
+
+## Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start Metro bundler |
+| `npm run start:reset` | Start Metro with cache reset |
+| `npm run android` | Run on Android device/emulator |
+| `npm run ios` | Run on iOS simulator |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Run ESLint and fix issues |
+| `npm run typecheck` | Run TypeScript type checking |
+| `npm test` | Run Jest tests |
+| `npm run clean` | Clean Android build |
+| `npm run clean:ios` | Clean and reinstall iOS pods |
+
+## Project Structure
+
+```
+Bookable/
+├── android/                 # Android native code
+├── ios/                     # iOS native code
+├── src/
+│   ├── assets/             # Static assets (images, fonts, etc.)
+│   ├── components/         # Reusable UI components
+│   │   └── SurplusLogo.tsx
+│   ├── config/             # App configuration
+│   │   └── index.ts        # Environment config helper
+│   ├── navigation/         # Navigation configuration
+│   │   └── AppNavigator.tsx
+│   ├── screens/            # Screen components
+│   │   ├── SplashScreen.tsx
+│   │   └── HomeScreen.tsx
+│   ├── store/              # Redux store configuration
+│   │   ├── index.ts
+│   │   └── slices/
+│   │       └── appSlice.ts
+│   ├── theme/              # Theme configuration
+│   │   └── colors.ts
+│   ├── types/              # TypeScript type definitions
+│   │   ├── svg.d.ts
+│   │   └── env.d.ts
+│   └── App.tsx             # Root application component
+├── patches/                 # Patch files for node_modules
+├── .env                    # Environment variables (mobile)
+├── mobile.env              # Mobile app environment config
+├── server.env              # Server environment config
+├── index.js                # Application entry point
+├── app.json                # App configuration
+├── babel.config.js         # Babel configuration
+├── metro.config.js         # Metro bundler configuration
+├── tsconfig.json           # TypeScript configuration
+├── .eslintrc.js           # ESLint configuration
+├── .prettierrc            # Prettier configuration
+└── package.json
+```
+
+## Path Aliases
+
+This project uses path aliases for cleaner imports:
+
+```typescript
+// Instead of:
+import Colors from '../../../theme/colors';
+
+// Use:
+import Colors from '@/theme/colors';
+```
+
+The `@` alias maps to the `./src` directory.
+
+## Native Module Configuration
+
+### Android
+
+Native modules are automatically linked. If you encounter issues:
+
+1. Clean the build:
+   ```bash
+   npm run clean
+   ```
+
+2. Rebuild:
+   ```bash
+   npm run android
+   ```
+
+### iOS
+
+1. Install pods:
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+2. If pods fail, try:
+   ```bash
+   npm run clean:ios
+   ```
+
+### Vector Icons Setup
+
+For Android, the icons should work automatically.
+
+For iOS, add the following to your `ios/Bookable/Info.plist`:
+```xml
+<key>UIAppFonts</key>
+<array>
+  <string>MaterialIcons.ttf</string>
+</array>
+```
+
+## Troubleshooting
+
+### Metro Bundler Issues
+
+Clear cache and restart:
+```bash
+npm run start:reset
+```
+
+### Android Build Issues
 
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+cd android
+./gradlew clean
+cd ..
+npm run android
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+### iOS Build Issues
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+```bash
+cd ios
+rm -rf Pods Podfile.lock
+pod install
+cd ..
+npm run ios
+```
 
-## Step 3: Modifying your App
+### TypeScript Errors
 
-Now that you have successfully run the app, let's modify it.
+Run type check:
+```bash
+npm run typecheck
+```
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+## Contributing
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+1. Create a feature branch
+2. Make your changes
+3. Run linting: `npm run lint:fix`
+4. Run type check: `npm run typecheck`
+5. Submit a pull request
 
-## Congratulations! :tada:
+## License
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Private - All rights reserved.
+# bookable
