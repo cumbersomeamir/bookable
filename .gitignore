@@ -75,3 +75,9 @@ mobile.env
 
 # Local config with secrets
 src/config/local.config.ts
+
+# Android local properties (contains API keys)
+android/local.properties
+
+# iOS local config
+ios/Config.xcconfig

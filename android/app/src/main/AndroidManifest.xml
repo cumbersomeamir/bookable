@@ -12,10 +12,10 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme">
       
-      <!-- Google Maps API Key -->
+      <!-- Google Maps API Key - Set in local.properties as GOOGLE_MAPS_API_KEY -->
       <meta-data
         android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyDh7WjdEqn7b16rPJmK8hu4VbPrbmckIRo"/>
+        android:value="${GOOGLE_MAPS_API_KEY}"/>
       
       <activity
         android:name=".MainActivity"

@@ -1,14 +1,22 @@
 #import "AppDelegate.h"
 
 #import <React/RCTBundleURLProvider.h>
+// Google Maps - Only import if available
+#if __has_include(<GoogleMaps/GoogleMaps.h>)
 #import <GoogleMaps/GoogleMaps.h>
+#endif
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  // Initialize Google Maps with API key
-  [GMSServices provideAPIKey:@"AIzaSyDh7WjdEqn7b16rPJmK8hu4VbPrbmckIRo"];
+  // Initialize Google Maps with API key from Info.plist
+  #if __has_include(<GoogleMaps/GoogleMaps.h>)
+  NSString *mapsApiKey = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"GOOGLE_MAPS_API_KEY"];
+  if (mapsApiKey && mapsApiKey.length > 0) {
+    [GMSServices provideAPIKey:mapsApiKey];
+  }
+  #endif
   
   self.moduleName = @"Bookable";
   // You can add your custom initial props in the dictionary below.

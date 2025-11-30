@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
@@ -27,9 +26,10 @@ try {
 
   // Only configure if the module loaded successfully
   if (GoogleSignin && typeof GoogleSignin.configure === 'function') {
+    // Web Client ID should be configured via environment variables
+    // For development, set GOOGLE_WEB_CLIENT_ID in mobile.env
     GoogleSignin.configure({
-      webClientId:
-        '170486330773-8ubl89d7uqg3sj8i10e7qab0loskt6eg.apps.googleusercontent.com',
+      webClientId: process.env.GOOGLE_WEB_CLIENT_ID || '',
       offlineAccess: true,
     });
     googleSignInAvailable = true;
@@ -42,7 +42,6 @@ try {
 const LoginScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const {loading} = useAppSelector((state: RootState) => state.auth);
-  const [email, setEmail] = useState('');
 
   const handleGoogleSignIn = async () => {
     if (!googleSignInAvailable || !GoogleSignin) {
@@ -90,63 +89,16 @@ const LoginScreen: React.FC = () => {
     }
   };
 
-  const handleEmailContinue = () => {
-    if (!email.includes('@')) {
-      Alert.alert('Invalid', 'Please enter a valid email address');
-      return;
-    }
-    Alert.alert(
-      'Coming Soon',
-      'Email authentication will be available soon. Please use Google Sign-In for now.',
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <Text style={styles.title}>Enter your email</Text>
+          <Text style={styles.title}>Sign in to continue</Text>
           <Text style={styles.subtitle}>
-            We'll need to verify it's you to continue.
+            Access your bookings, rewards, and personalized recommendations.
           </Text>
-
-          {/* Email Input */}
-          <View style={styles.emailInputContainer}>
-            <TextInput
-              style={styles.emailInput}
-              placeholder="Email address"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.continueButton,
-              !email.includes('@') && styles.continueButtonDisabled,
-            ]}
-            onPress={handleEmailContinue}
-            disabled={!email.includes('@')}>
-            <Text
-              style={[
-                styles.continueButtonText,
-                !email.includes('@') && styles.continueButtonTextDisabled,
-              ]}>
-              Continue
-            </Text>
-          </TouchableOpacity>
-
-          {/* Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.divider} />
-          </View>
 
           {/* Google Sign In */}
           <TouchableOpacity
@@ -198,63 +150,22 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingTop: 60,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: '#1F2937',
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: '#6B7280',
-    marginBottom: 32,
-  },
-  emailInputContainer: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    marginBottom: 24,
-  },
-  emailInput: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: '#1F2937',
-  },
-  continueButton: {
-    backgroundColor: '#DA3743',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  continueButtonDisabled: {
-    backgroundColor: '#F3F4F6',
-  },
-  continueButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  continueButtonTextDisabled: {
-    color: '#9CA3AF',
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E5E7EB',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
-    color: '#9CA3AF',
+    marginBottom: 40,
+    textAlign: 'center',
+    lineHeight: 24,
   },
   googleButton: {
     flexDirection: 'row',
@@ -263,9 +174,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    paddingVertical: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     borderRadius: 8,
-    gap: 8,
+    gap: 10,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   googleButtonText: {
     fontSize: 16,
@@ -276,7 +194,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 16,
   },
   footer: {
     paddingHorizontal: 24,
