@@ -1,9 +1,7 @@
 import React, {useEffect} from 'react';
-import {View, Text, StyleSheet, StatusBar, Dimensions} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import {View, Text, StyleSheet, StatusBar, Dimensions, Image} from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch} from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import {setLoading, setFirstLaunch} from '@/store/slices/appSlice';
 import {RootStackParamList} from '@/navigation/AppNavigator';
 
@@ -37,20 +35,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      <LinearGradient
-        colors={['#DA3743', '#C12E39', '#A82530']}
-        style={styles.gradient}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 1}}>
-        <View style={styles.content}>
-          <View style={styles.logoContainer}>
-            <Icon name="menu-book" size={80} color="#FFFFFF" />
-          </View>
-          <Text style={styles.title}>Bookable</Text>
-          <Text style={styles.subtitle}>Restaurant Reservations</Text>
-        </View>
-      </LinearGradient>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <View style={styles.content}>
+        <Image
+          source={require('@/assets/images/bookable-logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.tagline}>Restaurant Reservations</Text>
+      </View>
     </View>
   );
 };
@@ -58,36 +51,27 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-    width: width,
-    height: height,
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 40,
   },
-  logoContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  logo: {
+    width: width * 0.5,
+    height: width * 0.5,
+    maxWidth: 300,
+    maxHeight: 300,
     marginBottom: 24,
   },
-  title: {
-    fontSize: 40,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 1,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 8,
+  tagline: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#6B7280',
+    textAlign: 'center',
+    letterSpacing: 0.5,
   },
 });
 
