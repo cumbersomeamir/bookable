@@ -10,9 +10,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useAppDispatch, useAppSelector} from '@/store/hooks';
+import {useDispatch, useSelector} from 'react-redux';
 import {loginSuccess, setLoading} from '@/store/slices/authSlice';
 import type {RootState} from '@/store';
+
+// Get config at runtime - import at module level for proper bundling
+import Config from 'react-native-config';
+console.log('RN Config:', JSON.stringify(Config));
 
 // Conditionally import Google Sign-In
 let GoogleSignin: any = null;
@@ -26,13 +30,19 @@ try {
 
   // Only configure if the module loaded successfully
   if (GoogleSignin && typeof GoogleSignin.configure === 'function') {
-    // Web Client ID should be configured via environment variables
-    // For development, set GOOGLE_WEB_CLIENT_ID in mobile.env
-    GoogleSignin.configure({
-      webClientId: process.env.GOOGLE_WEB_CLIENT_ID || '',
-      offlineAccess: true,
-    });
-    googleSignInAvailable = true;
+    const webClientId = Config.GOOGLE_WEB_CLIENT_ID;
+    console.log('Web Client ID from Config:', webClientId);
+
+    if (webClientId) {
+      GoogleSignin.configure({
+        webClientId,
+        offlineAccess: true,
+      });
+      googleSignInAvailable = true;
+      console.log('Google Sign-In configured successfully');
+    } else {
+      console.log('Google Sign-In: GOOGLE_WEB_CLIENT_ID not set in .env');
+    }
   }
 } catch (e) {
   console.log('Google Sign-In not available:', e);
@@ -40,8 +50,8 @@ try {
 }
 
 const LoginScreen: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const {loading} = useAppSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const loading = useSelector((state: RootState) => state.auth.loading);
 
   const handleGoogleSignIn = async () => {
     if (!googleSignInAvailable || !GoogleSignin) {
