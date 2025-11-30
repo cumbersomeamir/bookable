@@ -77,4 +77,48 @@ export const restaurantDetailApi = {
     api.get(`/restaurant/cuisine/${cuisine}`, {params}),
 };
 
+// Booking APIs
+export interface CreateBookingParams {
+  restaurantId: string;
+  userId: string;
+  userEmail: string;
+  userName?: string;
+  date: string;
+  time: string;
+  partySize?: number;
+  specialRequests?: string;
+}
+
+export interface Booking {
+  _id: string;
+  restaurant: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  date: string;
+  time: string;
+  partySize: number;
+  status: 'confirmed' | 'completed' | 'cancelled' | 'no-show';
+  specialRequests?: string;
+  pointsEarned: number;
+  rating?: number;
+  ratedAt?: string;
+  confirmationNumber: string;
+  restaurantName: string;
+  restaurantImage: string;
+  restaurantCuisine: string;
+  restaurantArea: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const bookingApi = {
+  create: (params: CreateBookingParams) => api.post('/bookings', params),
+  getUserBookings: (userId: string) => api.get(`/bookings/user/${userId}`),
+  getById: (id: string) => api.get(`/bookings/${id}`),
+  cancel: (id: string, userId: string) => api.patch(`/bookings/${id}/cancel`, {userId}),
+  rate: (id: string, userId: string, rating: number) => 
+    api.patch(`/bookings/${id}/rate`, {userId, rating}),
+};
+
 export default api;

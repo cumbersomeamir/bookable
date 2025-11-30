@@ -8,15 +8,21 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StatusBar,
+  Modal,
+  Alert,
+  TextInput,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {restaurantDetailApi, ApiResponse} from '@/services/api';
+import {useAppSelector} from '@/store/hooks';
+import {restaurantDetailApi, bookingApi, ApiResponse} from '@/services/api';
 import {RestaurantFullDetail, MenuItem} from '@/types/restaurantDetail';
+import type {RootState} from '@/store';
 
 type RootStackParamList = {
   RestaurantDetail: {slug: string};
+  Main: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RestaurantDetail'>;
@@ -25,11 +31,29 @@ type TabType = 'bookings' | 'experiences' | 'concierge' | 'menu' | 'reviews' | '
 
 const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
   const {slug} = route.params;
+  const {isAuthenticated, user} = useAppSelector((state: RootState) => state.auth);
+  
   const [data, setData] = useState<RestaurantFullDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('bookings');
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Booking state
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [selectedPoints, setSelectedPoints] = useState<number>(0);
+  const [partySize, setPartySize] = useState(2);
+  const [specialRequests, setSpecialRequests] = useState('');
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  // Get today's date formatted
+  const today = new Date();
+  const dateString = today.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
 
   const fetchData = useCallback(async () => {
     try {
@@ -52,6 +76,67 @@ const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleTimeSlotPress = (time: string, points: number) => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Sign in required',
+        'Please sign in to make a booking',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {
+            text: 'Sign in',
+            onPress: () => navigation.navigate('Main'),
+          },
+        ],
+      );
+      return;
+    }
+
+    setSelectedTime(time);
+    setSelectedPoints(points);
+    setShowBookingModal(true);
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!data || !user?.id || !user?.email) return;
+
+    setBookingLoading(true);
+    try {
+      const response: any = await bookingApi.create({
+        restaurantId: data._id,
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.name || user.givenName || 'Guest',
+        date: today.toISOString(),
+        time: selectedTime,
+        partySize,
+        specialRequests: specialRequests || undefined,
+      });
+
+      if (response.success) {
+        setShowBookingModal(false);
+        setSpecialRequests('');
+        Alert.alert(
+          'Booking Confirmed! 🎉',
+          `Your table for ${partySize} at ${selectedTime} is confirmed.\n\nConfirmation: ${response.data.confirmationNumber}`,
+          [
+            {
+              text: 'View Bookings',
+              onPress: () => navigation.navigate('Main'),
+            },
+            {text: 'OK'},
+          ],
+        );
+      } else {
+        Alert.alert('Error', response.message || 'Failed to create booking');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to create booking. Please try again.');
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -104,7 +189,7 @@ const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
     <View style={styles.timeSlotsSection}>
       <View style={styles.bookingInfo}>
         <Icon name="person-outline" size={16} color="#1F2937" />
-        <Text style={styles.bookingInfoText}>2 • 19:30 Tonight</Text>
+        <Text style={styles.bookingInfoText}>{partySize} • Tonight</Text>
       </View>
       <Text style={styles.bookedToday}>
         <Icon name="calendar-today" size={14} color="#DA3743" /> Booked {data.todayBookings} times
@@ -112,7 +197,10 @@ const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
       </Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.timeSlotsScroll}>
         {data.timeSlots?.map((slot, index) => (
-          <TouchableOpacity key={index} style={styles.timeSlot}>
+          <TouchableOpacity
+            key={index}
+            style={styles.timeSlot}
+            onPress={() => handleTimeSlotPress(slot.time, slot.points)}>
             <View style={styles.timeSlotInner}>
               <Icon name="table-restaurant" size={14} color="#FFFFFF" />
               <Text style={styles.timeSlotText}>{slot.time}</Text>
@@ -247,7 +335,7 @@ const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
           </View>
           <View style={styles.ratingRight}>
             {[5, 4, 3, 2, 1].map(star => (
-              <View key={star} style={styles.ratingRow}>
+              <View key={star} style={styles.ratingRowStyle}>
                 <Text style={styles.ratingRowLabel}>{star}</Text>
                 {renderRatingBar(
                   data.ratingDistribution?.[
@@ -340,6 +428,91 @@ const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
     }
   };
 
+  const renderBookingModal = () => (
+    <Modal
+      visible={showBookingModal}
+      animationType="slide"
+      transparent
+      onRequestClose={() => setShowBookingModal(false)}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Confirm Booking</Text>
+            <TouchableOpacity onPress={() => setShowBookingModal(false)}>
+              <Icon name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.modalBody}>
+            <Text style={styles.modalRestaurantName}>{data.name}</Text>
+
+            <View style={styles.bookingDetailRow}>
+              <Icon name="event" size={20} color="#DA3743" />
+              <Text style={styles.bookingDetailText}>{dateString}</Text>
+            </View>
+
+            <View style={styles.bookingDetailRow}>
+              <Icon name="access-time" size={20} color="#DA3743" />
+              <Text style={styles.bookingDetailText}>{selectedTime}</Text>
+            </View>
+
+            {selectedPoints > 0 && (
+              <View style={styles.pointsBadge}>
+                <Icon name="star" size={16} color="#DA3743" />
+                <Text style={styles.pointsBadgeText}>
+                  Earn {selectedPoints.toLocaleString()} points with this booking
+                </Text>
+              </View>
+            )}
+
+            <Text style={styles.inputLabel}>Party size</Text>
+            <View style={styles.partySizeRow}>
+              {[1, 2, 3, 4, 5, 6].map(size => (
+                <TouchableOpacity
+                  key={size}
+                  style={[
+                    styles.partySizeButton,
+                    partySize === size && styles.partySizeButtonActive,
+                  ]}
+                  onPress={() => setPartySize(size)}>
+                  <Text
+                    style={[
+                      styles.partySizeText,
+                      partySize === size && styles.partySizeTextActive,
+                    ]}>
+                    {size}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.inputLabel}>Special requests (optional)</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Any dietary requirements or special occasions?"
+              placeholderTextColor="#9CA3AF"
+              value={specialRequests}
+              onChangeText={setSpecialRequests}
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.confirmButton, bookingLoading && styles.confirmButtonDisabled]}
+            onPress={handleConfirmBooking}
+            disabled={bookingLoading}>
+            {bookingLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.confirmButtonText}>Confirm Booking</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -405,6 +578,8 @@ const RestaurantDetailScreen: React.FC<Props> = ({route, navigation}) => {
 
         <View style={{height: 100}} />
       </ScrollView>
+
+      {renderBookingModal()}
     </View>
   );
 };
@@ -569,7 +744,7 @@ const styles = StyleSheet.create({
   overallRatingLabel: {fontSize: 14, color: '#6B7280', marginBottom: 4},
   overallRatingValue: {fontSize: 48, fontWeight: '700', color: '#1F2937'},
   ratingRight: {flex: 1, justifyContent: 'center'},
-  ratingBarRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 4},
+  ratingRowStyle: {flexDirection: 'row', alignItems: 'center', marginBottom: 4},
   ratingRowLabel: {width: 16, fontSize: 12, color: '#6B7280'},
   ratingBar: {flex: 1, height: 8, backgroundColor: '#E5E7EB', borderRadius: 4, marginLeft: 8},
   ratingBarFill: {height: '100%', backgroundColor: '#DA3743', borderRadius: 4},
@@ -606,6 +781,77 @@ const styles = StyleSheet.create({
   descriptionSection: {flexDirection: 'row', marginTop: 8},
   descriptionTitle: {fontSize: 15, fontWeight: '600', color: '#1F2937', marginBottom: 8},
   descriptionText: {fontSize: 14, color: '#6B7280', lineHeight: 22},
+
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 34,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {fontSize: 18, fontWeight: '700', color: '#1F2937'},
+  modalBody: {padding: 20},
+  modalRestaurantName: {fontSize: 20, fontWeight: '700', color: '#1F2937', marginBottom: 16},
+  bookingDetailRow: {flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12},
+  bookingDetailText: {fontSize: 16, color: '#1F2937'},
+  pointsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  pointsBadgeText: {fontSize: 14, color: '#DA3743', fontWeight: '500'},
+  inputLabel: {fontSize: 14, fontWeight: '600', color: '#1F2937', marginBottom: 8, marginTop: 16},
+  partySizeRow: {flexDirection: 'row', gap: 8},
+  partySizeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  partySizeButtonActive: {backgroundColor: '#DA3743', borderColor: '#DA3743'},
+  partySizeText: {fontSize: 16, fontWeight: '600', color: '#6B7280'},
+  partySizeTextActive: {color: '#FFFFFF'},
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 15,
+    color: '#1F2937',
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  confirmButton: {
+    backgroundColor: '#DA3743',
+    marginHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  confirmButtonDisabled: {opacity: 0.6},
+  confirmButtonText: {fontSize: 16, fontWeight: '700', color: '#FFFFFF'},
 });
 
 export default RestaurantDetailScreen;

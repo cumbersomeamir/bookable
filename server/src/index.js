@@ -15,6 +15,7 @@ const collectionRoutes = require('./routes/collectionRoutes');
 const experienceRoutes = require('./routes/experienceRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -39,6 +40,7 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/experiences', experienceRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
