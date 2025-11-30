@@ -64,3 +64,14 @@ yarn-error.log
 
 # testing
 /coverage
+
+# Environment files
+*.env
+server.env
+mobile.env
+.env.local
+.env.development
+.env.production
+
+# Local config with secrets
+src/config/local.config.ts

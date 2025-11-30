@@ -1,0 +1,4 @@
+# This directory contains patches for node_modules packages
+# Use patch-package to create patches when needed:
+# npx patch-package <package-name>
+
